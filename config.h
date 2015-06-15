@@ -476,9 +476,9 @@ At this moment you can use this function only with WinGUI 2.3 release. MultiWiiC
 
   /* only enable any of this if you must change the default pin assignment, e.g. your board does not have a specific pin */
   /* you may need to change PINx and PORTx plus #shift according to the desired pin! */
-  //#define OVERRIDE_V_BATPIN                   A0 // instead of A3    // Analog PIN 3
+  #define OVERRIDE_V_BATPIN                   A14 // instead of A3    // Analog PIN 3
 
-  //#define OVERRIDE_PSENSORPIN                 A1 // instead of A2    // Analog PIN 2
+  #define OVERRIDE_PSENSORPIN                 A15 // instead of A2    // Analog PIN 2
 
   //#define OVERRIDE_LEDPIN_PINMODE             pinMode (A1, OUTPUT); // use A1 instead of d13
   //#define OVERRIDE_LEDPIN_TOGGLE              PINC |= 1<<1; // PINB |= 1<<5;     //switch LEDPIN state (digital PIN 13)
@@ -703,7 +703,7 @@ At this moment you can use this function only with WinGUI 2.3 release. MultiWiiC
     #define GPS_LED_INDICATOR
 
    //Enables the MSP_WP command set , which is used by WinGUI for displaying an setting up navigation
-   //#define USE_MSP_WP
+   #define USE_MSP_WP
 
    // HOME position is reset at every arm, uncomment it to prohibit it (you can set home position with GyroCalibration)    
    //#define DONT_RESET_HOME_AT_ARM
