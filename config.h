@@ -498,7 +498,7 @@ At this moment you can use this function only with WinGUI 2.3 release. MultiWiiC
   /******                Serial com speed    *********************************/
     /* This is the speed of the serial interfaces */
     #define SERIAL0_COM_SPEED 115200
-    #define SERIAL1_COM_SPEED 115200
+    #define SERIAL1_COM_SPEED 57600 // used for 3DR radio
     #define SERIAL2_COM_SPEED 115200
     #define SERIAL3_COM_SPEED 115200
 
