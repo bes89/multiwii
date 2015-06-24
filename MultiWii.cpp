@@ -23,6 +23,7 @@ March  2015     V2.4
 #include "RX.h"
 #include "Sensors.h"
 #include "Serial.h"
+#include "HoTTv4.h"
 #include "GPS.h"
 #include "Protocol.h"
 
@@ -587,7 +588,11 @@ void annexCode() { // this code is excetuted at each loop and won't interfere wi
       if (telemetry) lcd_telemetry();
     }
   #endif
-
+  #if defined (HOTTV4_TELEMETRY) && defined (MEGA)
+    if (SerialAvailable(3)) {
+      hottV4Hook(SerialRead(3));
+    }
+  #endif
   #if GPS & defined(GPS_LED_INDICATOR)       // modified by MIS to use STABLEPIN LED for number of sattelites indication
     static uint32_t GPSLEDTime;              // - No GPS FIX -> LED blink at speed of incoming GPS frames
     static uint8_t blcnt;                    // - Fix and sat no. bellow 5 -> LED off
@@ -734,6 +739,9 @@ void setup() {
     led_flasher_set_sequence(LED_FLASHER_SEQUENCE);
   #endif
   f.SMALL_ANGLES_25=1; // important for gyro only conf
+  #if defined (HOTTV4_TELEMETRY)
+    hottv4Init();
+  #endif
   #ifdef LOG_PERMANENT
     // read last stored set
     readPLog();
@@ -790,6 +798,9 @@ void go_arm() {
         #ifdef WATTS
           wattsMax = 0;
         #endif
+      #endif
+      #if defined (HOTTV4_TELEMETRY)
+          hottv4Setup();
       #endif
       #ifdef LOG_PERMANENT
         plog.arm++;           // #arm events

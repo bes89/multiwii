@@ -9,6 +9,7 @@
 #include "MultiWii.h"
 #include "Serial.h"
 #include "Protocol.h"
+#include "HoTTv4.h"
 #include "RX.h"
 
 /************************************** MultiWii Serial Protocol *******************************************************/
@@ -195,6 +196,19 @@ void serialCom() {
       bytesTXBuff = SerialUsedTXBuff(port); // indicates the number of occupied bytes in TX buffer
       if (bytesTXBuff > TX_BUFFER_SIZE - 50 ) return; // ensure there is enough free TX buffer to go further (50 bytes margin)
       c = SerialRead(port);
+
+      #if defined(HOTTV4_TELEMETRY) && !defined(MEGA)
+        if (
+        #if defined (MEGA)
+          port == 3
+        #else
+          port == 0
+        #endif
+        ) {
+          hottV4Hook(c);
+        }
+      #endif
+
       #ifdef SUPPRESS_ALL_SERIAL_MSP
         evaluateOtherData(c); // no MSP handling, so go directly
       #else //SUPPRESS_ALL_SERIAL_MSP
