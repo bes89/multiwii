@@ -1,8 +1,11 @@
 #include "Arduino.h"
-#include "Serial.h"
 #include "config.h"
 #include "def.h"
 #include "types.h"
+#include "EEPROM.h"
+#include "MultiWii.h"
+#include "IMU.h"
+#include "Serial.h"
 
 #if defined(HOTTV4_TELEMETRY)
 
@@ -233,10 +236,10 @@ static void hottV4SendBinary(uint8_t *data) {
  * 1 = 2 degree
  */
 static void hottV4UpdateDirection(uint8_t *data) {  
-  if (heading < 0) {
-    data[6] = (heading + 360) >> 1;
+  if (att.heading < 0) {
+    data[6] = (att.heading + 360) >> 1;
   } else {
-    data[6] = heading >> 1;
+    data[6] = att.heading >> 1;
   }
 }
 
@@ -261,12 +264,12 @@ static void hottV4TriggerNotification(uint8_t *data, uint8_t notification) {
  * If value is below HOTTV4_VOLTAGE_WARNING, telemetry alarm is triggered
  */
 static void hottv4UpdateBattery(uint8_t *data) {
-  data[30] = vbat; 
+  data[30] = analog.vbat; 
 
   // Activate low voltage alarm if above 3.0V
-  if (vbat <= HOTTV4_VOLTAGE_WARNING && vbat > 30) {
+  if (analog.vbat <= HOTTV4_VOLTAGE_WARNING && analog.vbat > 30) {
     hottV4TriggerNotification(data, HoTTv4NotificationUndervoltage);
-  } else if (vbat > HOTTV4_VOLTAGE_MAX) {
+  } else if (analog.vbat > HOTTV4_VOLTAGE_MAX) {
     hottV4TriggerNotification(data, HoTTv4NotificationErrorError);
   }
 }
@@ -279,17 +282,17 @@ static void hottv4UpdateBattery(uint8_t *data) {
  * @param lowByteIndex Index for the low byte that represents the altitude in telemetry data frame
  */
 static void hottv4UpdateAlt(uint8_t *data, uint8_t lowByteIndex) {
-  int32_t alt;
+  int32_t altitude;
   
   if (!f.GPS_FIX) {
-    alt = EstAlt - referenceAltitude;
+    altitude = alt.EstAlt - referenceAltitude;
   } else {
-    alt = GPS_altitude;
+    altitude = GPS_altitude;
   }
   
-  alt = (alt / 100) + 500;
-  data[lowByteIndex] = alt;
-  data[lowByteIndex + 1] = (alt >> 8) & 0xFF;  
+  altitude = (altitude / 100) + 500;
+  data[lowByteIndex] = altitude;
+  data[lowByteIndex + 1] = (altitude >> 8) & 0xFF;  
 }
 
 /**
@@ -321,7 +324,7 @@ static void hottv4UpdateFlightTime(uint8_t *data) {
  */
 void hottv4Init() {
   // Set start altitude for relative altitude calculation
-  referenceAltitude = EstAlt;
+  referenceAltitude = alt.EstAlt;
   hottV4EnableReceiverMode();
     
   #if defined (MEGA)
@@ -339,7 +342,7 @@ void hottv4Init() {
  * Initializes parameters e.g. relative high
  */
 void hottv4Setup() {
-  referenceAltitude = EstAlt;
+  referenceAltitude = alt.EstAlt;
   
   milliseconds = 0;
   minutes = 0;
@@ -529,9 +532,11 @@ static void hottV4SendVarioTelemetry() {
     snprintf(text, VARIO_ASCIIS+1, HOTTV4_VARIO_POSITION_HOLD);
   } else if (1 == rcOptions[BOXBARO]) {
     snprintf(text, VARIO_ASCIIS+1, HOTTV4_VARIO_ALT_HOLD);
+  #if defined(HEADFREE)
   } else if (1 == rcOptions[BOXHEADFREE]) {
     snprintf(text, VARIO_ASCIIS+1, HOTTV4_VARIO_HEADFREE);
-  } else if (1 == rcOptions[BOXACC]) {
+  #endif
+  } else if (1 == rcOptions[BOXANGLE]) {
     snprintf(text, VARIO_ASCIIS+1, HOTTV4_VARIO_STABLE);
   } else {
     snprintf(text, VARIO_ASCIIS+1, HOTTV4_VARIO_EMPTY);
@@ -708,7 +713,8 @@ static uint16_t hottV4SendFormattedPIDTextline(void* data, int8_t selectedCol) {
   crc += hottV4SendWord(label, 0);
   
   if (textData->controllerValue & (HoTTv4ControllerValueP | HoTTv4ControllerValuePID)) {
-      crc += hottV4SendFormattedPValue(conf.P8[index], 2 == selectedCol);
+    // todo: validate: changed conf.P8[index] to conf.pid[index].P8
+    crc += hottV4SendFormattedPValue(conf.pid[index].P8, 2 == selectedCol);
   } else {
     crc += hottV4SendWord(" -- ", 0);
   }
@@ -716,7 +722,7 @@ static uint16_t hottV4SendFormattedPIDTextline(void* data, int8_t selectedCol) {
   crc += hottV4SendChar(' ', 0);
   
   if (textData->controllerValue & (HoTTv4ControllerValuePID)) {
-    crc += hottV4SendFormattedIValue(conf.I8[index], 3 == selectedCol);
+    crc += hottV4SendFormattedIValue(conf.pid[index].I8, 3 == selectedCol);
   } else {
     crc += hottV4SendWord(" --- ", 0);
   }
@@ -724,7 +730,7 @@ static uint16_t hottV4SendFormattedPIDTextline(void* data, int8_t selectedCol) {
   crc += hottV4SendChar(' ', 0);
   
   if (textData->controllerValue & (HoTTv4ControllerValuePID)) {
-    crc += hottV4SendFormattedDValue(conf.D8[index], 4 == selectedCol);
+    crc += hottV4SendFormattedDValue(conf.pid[index].D8, 4 == selectedCol);
   } else {
     crc += hottV4SendWord(" - ", 0);
   }
@@ -765,25 +771,25 @@ static uint16_t hottV4SendDebugInfos(int8_t selectedRow, int8_t selectedCol) {
   char formattedLine[22];
   
   // GYRO
-  snprintf(formattedLine, 22, " GYRO: %+04d %+04d %+04d", gyroData[0], gyroData[1], gyroData[2]);
+  snprintf(formattedLine, 22, " GYRO: %+04d %+04d %+04d", imu.gyroData[0], imu.gyroData[1], imu.gyroData[2]);
   crc += hottV4SendTextline(formattedLine);
   
   // ACC
-  crc += hottV4SendWord(" ACC ", rcOptions[BOXACC]);
-  snprintf(formattedLine, 17, ": %+04d %+04d %+04d", accSmooth[0], accSmooth[1], accSmooth[2]);
+  crc += hottV4SendWord(" ACC ", rcOptions[BOXANGLE]);
+  snprintf(formattedLine, 17, ": %+04d %+04d %+04d", imu.accSmooth[0], imu.accSmooth[1], imu.accSmooth[2]);
   crc += hottV4SendWord(formattedLine, 0);
   
   // MAG
   crc += hottV4SendWord(" MAG ", rcOptions[BOXMAG]);
-  snprintf(formattedLine, 17, ": %+04d %+04d %+04d", magADC[0], magADC[1], magADC[2]);
+  snprintf(formattedLine, 17, ": %+04d %+04d %+04d", imu.magADC[0], imu.magADC[1], imu.magADC[2]);
   crc += hottV4SendWord(formattedLine, 0);
   
   // BARO
   crc += hottV4SendWord(" BARO", rcOptions[BOXBARO]);
   
   // Without this it cannot be uploaded to the procs
-  uint8_t barocm = BaroAlt % 10;
-  snprintf(formattedLine, 17, ": %+05d.%02dm      ", (int16_t) BaroAlt / 100, barocm);
+  uint8_t barocm = alt.EstAlt % 10;
+  snprintf(formattedLine, 17, ": %+05d.%02dm      ", (int16_t) alt.EstAlt / 100, barocm);
   crc += hottV4SendWord(formattedLine, 0);
   
   // Debug 3
@@ -886,13 +892,14 @@ static void hottV4UpdatePIDValueBy(int8_t row, int8_t col, int8_t val) {
   
   switch (col) {
     case 2:
-      conf.P8[pidIndex] =  hottV4Constrain(conf.P8[pidIndex] + val, 200);
+      // todo: validate: changed conf.P8[pidIndex] to conf.pid[pidIndex].P8
+      conf.pid[pidIndex].P8 =  hottV4Constrain(conf.pid[pidIndex].P8 + val, 200);
       break;
     case 3:
-      conf.I8[pidIndex] = hottV4Constrain(conf.I8[pidIndex] + val, 250);
+      conf.pid[pidIndex].I8 = hottV4Constrain(conf.pid[pidIndex].I8 + val, 250);
       break;
     case 4:
-      conf.D8[pidIndex] =  hottV4Constrain(conf.D8[pidIndex] + val, 100);;
+      conf.pid[pidIndex].D8 =  hottV4Constrain(conf.pid[pidIndex].D8 + val, 100);;
       break;
   } 
 }
