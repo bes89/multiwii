@@ -198,13 +198,7 @@ void serialCom() {
       c = SerialRead(port);
 
       #if defined(HOTTV4_TELEMETRY) && !defined(MEGA)
-        if (
-        #if defined (MEGA)
-          port == 3
-        #else
-          port == 0
-        #endif
-        ) {
+        if (port == HOTTV4_TELEMETRY_SERIAL_PORT) {
           hottV4Hook(c);
         }
       #endif

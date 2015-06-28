@@ -588,9 +588,10 @@ void annexCode() { // this code is excetuted at each loop and won't interfere wi
       if (telemetry) lcd_telemetry();
     }
   #endif
+  // todo: only for mega boards?
   #if defined (HOTTV4_TELEMETRY) && defined (MEGA)
-    if (SerialAvailable(3)) {
-      hottV4Hook(SerialRead(3));
+    if (SerialAvailable(HOTTV4_TELEMETRY_SERIAL_PORT)) {
+      hottV4Hook(SerialRead(HOTTV4_TELEMETRY_SERIAL_PORT));
     }
   #endif
   #if GPS & defined(GPS_LED_INDICATOR)       // modified by MIS to use STABLEPIN LED for number of sattelites indication

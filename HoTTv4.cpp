@@ -127,20 +127,23 @@ static uint16_t milliseconds = 0;
  * MEGA boards and remaining boards.
  */
 static uint8_t hottV4SerialAvailable() {
-  #if defined (MEGA)
-    return SerialAvailable(3);
-  #else
-    return SerialAvailable(0);
-  #endif
+  // replace function call
+  return SerialAvailable(HOTTV4_TELEMETRY_SERIAL_PORT);
 }
 
 /**
  * Enables RX and disables TX
  */
 static void hottV4EnableReceiverMode() {
-  #if defined (MEGA)  
+  #if HOTTV4_TELEMETRY_SERIAL_PORT == 3
     UCSR3B &= ~_BV(TXEN3);
     UCSR3B |= _BV(RXEN3);
+  #elif HOTTV4_TELEMETRY_SERIAL_PORT == 2
+    UCSR2B &= ~_BV(TXEN2);
+    UCSR2B |= _BV(RXEN2);
+  #elif HOTTV4_TELEMETRY_SERIAL_PORT == 1
+    UCSR1B &= ~_BV(TXEN1);
+    UCSR1B |= _BV(RXEN1);
   #else
     UCSR0B &= ~_BV(TXEN0);
     UCSR0B |= _BV(RXEN0);
@@ -151,12 +154,18 @@ static void hottV4EnableReceiverMode() {
  * Enabels TX and disables RX
  */
 static void hottV4EnableTransmitterMode() {
-  #if defined (MEGA)  
+  #if HOTTV4_TELEMETRY_SERIAL_PORT == 3
     UCSR3B &= ~_BV(RXEN3);
     UCSR3B |= _BV(TXEN3);
+  #elif HOTTV4_TELEMETRY_SERIAL_PORT == 2
+    UCSR2B &= ~_BV(RXEN2);
+    UCSR2B |= _BV(TXEN2);
+  #elif HOTTV4_TELEMETRY_SERIAL_PORT == 1
+    UCSR1B &= ~_BV(RXEN1);
+    UCSR1B |= _BV(TXEN1);
   #else
     UCSR0B &= ~_BV(RXEN0);
-    UCSR0B |= _BV(TXEN0); 
+    UCSR0B |= _BV(TXEN0);
   #endif
 }
 
@@ -164,9 +173,15 @@ static void hottV4EnableTransmitterMode() {
  * Writes out given data to data register.
  */
 static void hottV4SerialWrite(uint8_t data) {
-  #if defined (MEGA)
+  #if HOTTV4_TELEMETRY_SERIAL_PORT == 3
     loop_until_bit_is_set(UCSR3A, UDRE3);
     UDR3 = data;
+  #elif HOTTV4_TELEMETRY_SERIAL_PORT == 2
+    loop_until_bit_is_set(UCSR2A, UDRE2);
+    UDR2 = data;
+  #elif HOTTV4_TELEMETRY_SERIAL_PORT == 1
+    loop_until_bit_is_set(UCSR1A, UDRE1);
+    UDR1 = data;
   #else
     loop_until_bit_is_set(UCSR0A, UDRE0);
     UDR0 = data;
@@ -179,11 +194,8 @@ static void hottV4SerialWrite(uint8_t data) {
  * Read from Serial interface
  */
 static uint8_t hottV4SerialRead() {
-  #if defined (MEGA)
-    return SerialRead(3);
-  #else
-    return SerialRead(0);
-  #endif
+  // todo: replace function call
+  return SerialRead(HOTTV4_TELEMETRY_SERIAL_PORT);
 }
 
 /**
@@ -193,9 +205,15 @@ static uint8_t hottV4SerialRead() {
 static void hottV4LoopUntilRegistersReady() {
   delayMicroseconds(HOTTV4_TX_DELAY); 
   
-  #if defined (MEGA)
+  #if HOTTV4_TELEMETRY_SERIAL_PORT == 3
     loop_until_bit_is_set(UCSR3A, UDRE3);
     loop_until_bit_is_set(UCSR3A, TXC3);
+  #elif HOTTV4_TELEMETRY_SERIAL_PORT == 2
+    loop_until_bit_is_set(UCSR2A, UDRE2);
+    loop_until_bit_is_set(UCSR2A, TXC2);
+  #elif HOTTV4_TELEMETRY_SERIAL_PORT == 1
+    loop_until_bit_is_set(UCSR1A, UDRE1);
+    loop_until_bit_is_set(UCSR1A, TXC1);
   #else
     loop_until_bit_is_set(UCSR0A, UDRE0);
     loop_until_bit_is_set(UCSR0A, TXC0);
@@ -326,7 +344,8 @@ void hottv4Init() {
   // Set start altitude for relative altitude calculation
   referenceAltitude = alt.EstAlt;
   hottV4EnableReceiverMode();
-    
+  
+  // todo: only on mega board?  
   #if defined (MEGA)
     /* Enable PullUps on RX3
      * without signal is to weak to be recognized
@@ -334,7 +353,7 @@ void hottv4Init() {
     DDRJ &= ~(1 << 0);
     PORTJ |= (1 << 0);
   
-    SerialOpen(3, 19200);
+    SerialOpen(HOTTV4_TELEMETRY_SERIAL_PORT, HOTTV4_TELEMETRY_SERIAL_SPEED);
   #endif
 }
 

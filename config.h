@@ -841,7 +841,8 @@ Also note, that maqgnetic declination changes with time, so recheck your value e
     #define HOTTV4_TELEMETRY // Define for use of Graupner HoTT v4 telemetry usage
     #define HOTTV4_VOLTAGE_MAX 126 // Max. voltage of used batttery, e.g. LiPo 3S = 12,6V
     #define HOTTV4_VOLTAGE_WARNING 103 // Battery level when alarm is triggered (10,3V)
-    // if your board is not an atmega2560 use 19200 instead of 115200 for SERIAL_COM_SPEED
+    #define HOTTV4_TELEMETRY_SERIAL_PORT 3
+    #define HOTTV4_TELEMETRY_SERIAL_SPEED 19200
 
   /**************************************************************************************/
   /***********************      LCD       telemetry            **************************/
