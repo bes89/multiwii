@@ -1439,7 +1439,7 @@ void mixTable() {
       servo[i] += get_middle(i);
     }
   #else
-    #error "missing coptertype mixtable entry. Either you forgot to define a copter type or the mixing table is lacking neccessary code"
+    #error "missing coptertype mixtable entry. Either you forgot to define a copter type or the mixing table is lacking necessary code"
   #endif // MY_PRIVATE_MIXING
 
   /************************************************************************************************************/
