@@ -285,8 +285,8 @@ void  i2c_OLED_init(void){
   delay(50);
   i2c_OLED_send_cmd(0x20);            //Set Memory Addressing Mode
   i2c_OLED_send_cmd(0x02);            //Set Memory Addressing Mode to Page addressing mode(RESET)
-//  i2c_OLED_send_cmd(0xa0);      //colum address 0 mapped to SEG0 (POR)*** wires at bottom
-  i2c_OLED_send_cmd(0xa1);    //colum address 127 mapped to SEG0 (POR) ** wires at top of board
+//  i2c_OLED_send_cmd(0xa0);      //column address 0 mapped to SEG0 (POR)*** wires at bottom
+  i2c_OLED_send_cmd(0xa1);    //column address 127 mapped to SEG0 (POR) ** wires at top of board
 //  i2c_OLED_send_cmd(0xC0);            // Scan from Right to Left (POR)         *** wires at bottom
   i2c_OLED_send_cmd(0xC8);          // Scan from Left to Right               ** wires at top
   i2c_OLED_send_cmd(0xa6);            // Set WHITE chars on BLACK backround
@@ -320,7 +320,7 @@ void i2c_OLED_send_char(unsigned char ascii){
   i2c_OLED_send_byte(CHAR_FORMAT);    // the gap
 }
 
-void i2c_OLED_send_string(const char *string){  // Sends a string of chars untill null terminator
+void i2c_OLED_send_string(const char *string){  // Sends a string of chars until null terminator
   unsigned char i=0;
   while(*string){
     for(i=0;i<5;i++){
