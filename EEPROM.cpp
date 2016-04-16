@@ -311,7 +311,7 @@ void storeWP() {
 }
 
 // Read the given number of WP from the eeprom, supposedly we can use this during flight.
-// Returns true when reading is successfull and returns false if there were some error (for example checksum)
+// Returns true when reading is successful and returns false if there were some error (for example checksum)
 bool recallWP(uint8_t wp_number) {
   if (wp_number > 254) return false;
   eeprom_read_block((void*)&mission_step, (void*)(PROFILES * sizeof(conf) + sizeof(global_conf)+sizeof(GPS_conf)+(sizeof(mission_step)*wp_number)), sizeof(mission_step));
