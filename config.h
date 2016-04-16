@@ -503,7 +503,7 @@ At this moment you can use this function only with WinGUI 2.3 release. MultiWiiC
     #define SERIAL3_COM_SPEED 115200
 
     /* when there is an error on I2C bus, we neutralize the values during a short time. expressed in microseconds
-       it is relevent only for a conf with at least a WMP */
+       it is relevant only for a conf with at least a WMP */
     #define NEUTRALIZE_DELAY 100000
 
   /**************************************************************************************/
@@ -685,7 +685,7 @@ At this moment you can use this function only with WinGUI 2.3 release. MultiWiiC
     //#define INIT_MTK_GPS        // initialize MTK GPS for using selected speed, 5Hz update rate and GGA & RMC sentence or binary settings
 
 
-    /* I2C GPS device made with an independant arduino + GPS device
+    /* I2C GPS device made with an independent arduino + GPS device
        including some navigation functions
        contribution from EOSBandi   http://code.google.com/p/i2c-gps-nav/ 
        You have to use at least I2CGpsNav code r33 */
@@ -960,7 +960,7 @@ Also note, that maqgnetic declination changes with time, so recheck your value e
     //#define VARIOMETER 12            // possible values: 12 = methods 1 & 2 ; 1 = method 1 ; 2 = method 2
     //#define SUPPRESS_VARIOMETER_UP   // if no signaling for up movement is desired
     //#define SUPPRESS_VARIOMETER_DOWN // if no signaling for down movement is desired
-    //#define VARIOMETER_SINGLE_TONE   // use only one tone (BEL); neccessary for non-patched vt100 terminals
+    //#define VARIOMETER_SINGLE_TONE   // use only one tone (BEL); necessary for non-patched vt100 terminals
 
   /********************************************************************/
   /****           board naming                                     ****/
