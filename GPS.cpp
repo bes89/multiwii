@@ -232,7 +232,7 @@ uint8_t GPS_Compute(void) {
       GPS_directionToHome = 0;
     }
 
-    //Check fence setting and execute RTH if neccessary
+    //Check fence setting and execute RTH if necessary
     //TODO: autolanding
     if ((GPS_conf.fence > 0) && (GPS_conf.fence < GPS_distanceToHome) && (f.GPS_mode != GPS_MODE_RTH) ) {
       init_RTH();
@@ -629,7 +629,7 @@ void GPS_calc_longitude_scaling(int32_t lat) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
-// Sets the waypoint to navigate, reset neccessary variables and calculate initial values
+// Sets the waypoint to navigate, reset necessary variables and calculate initial values
 //
 void GPS_set_next_wp(int32_t* lat_to, int32_t* lon_to, int32_t* lat_from, int32_t* lon_from) {
   GPS_WP[LAT] = *lat_to;

@@ -748,7 +748,7 @@ void evaluateOtherData(uint8_t sr) {
     switch (sr) {
     // Note: we may receive weird characters here which could trigger unwanted features during flight.
     //       this could lead to a crash easily.
-    //       Please use if (!f.ARMED) where neccessary
+    //       Please use if (!f.ARMED) where necessary
       #ifdef LCD_CONF
         case 's':
         case 'S':

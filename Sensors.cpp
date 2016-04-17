@@ -328,7 +328,7 @@ static void Baro_Common() {
 // ************************************************************************************************************
 // I2C Barometer BOSCH BMP085
 // ************************************************************************************************************
-// I2C adress: 0x77 (7bit)
+// I2C address: 0x77 (7bit)
 // principle:
 //  1) read the calibration register (only once at the initialization)
 //  2) read uncompensated temperature (not mandatory at every cycle)
@@ -639,11 +639,11 @@ void ACC_getADC () {
 // ************************************************************************************************************
 // I2C Accelerometer ADXL345 
 // ************************************************************************************************************
-// I2C adress: 0x3A (8bit)    0x1D (7bit)
+// I2C address: 0x3A (8bit)    0x1D (7bit)
 // Resolution: 10bit (Full range - 14bit, but this is autoscaling 10bit ADC to the range +- 16g)
 // principle:
 //  1) CS PIN must be linked to VCC to select the I2C mode
-//  2) SD0 PIN must be linked to VCC to select the right I2C adress
+//  2) SD0 PIN must be linked to VCC to select the right I2C address
 //  3) bit  b00000100 must be set on register 0x2D to read data (only once at the initialization)
 //  4) bits b00001011 must be set on register 0x31 to select the data format (only once at the initialization)
 // ************************************************************************************************************
@@ -673,8 +673,8 @@ void ACC_getADC () {
 // ************************************************************************************************************
 // I2C Accelerometer BMA180
 // ************************************************************************************************************
-// I2C adress: 0x80 (8bit)    0x40 (7bit) (SDO connection to VCC) 
-// I2C adress: 0x82 (8bit)    0x41 (7bit) (SDO connection to VDDIO)
+// I2C address: 0x80 (8bit)    0x40 (7bit) (SDO connection to VCC) 
+// I2C address: 0x82 (8bit)    0x41 (7bit) (SDO connection to VDDIO)
 // Resolution: 14bit
 //
 // Control registers:
@@ -754,7 +754,7 @@ void ACC_getADC () {
 // ************************************************************************************************************
 // I2C Accelerometer BMA020
 // ************************************************************************************************************
-// I2C adress: 0x70 (8bit)
+// I2C address: 0x70 (8bit)
 // Resolution: 10bit
 // Control registers:
 //
@@ -872,12 +872,12 @@ void Gyro_getADC () {
 // ************************************************************************************************************
 // I2C Gyroscope ITG3200 / ITG3205 / ITG3050 / MPU3050
 // ************************************************************************************************************
-// I2C adress: 0xD2 (8bit)   0x69 (7bit)
-// I2C adress: 0xD0 (8bit)   0x68 (7bit)
+// I2C address: 0xD2 (8bit)   0x69 (7bit)
+// I2C address: 0xD0 (8bit)   0x68 (7bit)
 // principle:
 // 1) VIO is connected to VDD
-// 2) I2C adress is set to 0x69 (AD0 PIN connected to VDD)
-// or 2) I2C adress is set to 0x68 (AD0 PIN connected to GND)
+// 2) I2C address is set to 0x69 (AD0 PIN connected to VDD)
+// or 2) I2C address is set to 0x68 (AD0 PIN connected to GND)
 // 3) sample rate = 1000Hz ( 1kHz/(div+1) )
 // ************************************************************************************************************
 #if defined(ITG3200) || defined(ITG3050) || defined(MPU3050)
@@ -964,7 +964,7 @@ uint8_t Mag_getADC() { // return 1 when news values are available, 0 otherwise
 // ************************************************************************************************************
 // I2C Compass MAG3110
 // ************************************************************************************************************
-// I2C adress: 0x0E (7bit)
+// I2C address: 0x0E (7bit)
 // ************************************************************************************************************
 #if defined(MAG3110)
 #define MAG_ADDRESS 0x0E
@@ -994,7 +994,7 @@ void Mag_init() {
 // ************************************************************************************************************
 // I2C Compass HMC5883
 // ************************************************************************************************************
-// I2C adress: 0x3C (8bit)   0x1E (7bit)
+// I2C address: 0x3C (8bit)   0x1E (7bit)
 // ************************************************************************************************************
 
 #if defined(HMC5883)
@@ -1073,7 +1073,7 @@ static void Device_Mag_getADC() {
 // ************************************************************************************************************
 // I2C Compass HMC5843
 // ************************************************************************************************************
-// I2C adress: 0x3C (8bit)   0x1E (7bit)
+// I2C address: 0x3C (8bit)   0x1E (7bit)
 // ************************************************************************************************************
 #if defined(HMC5843)
 #define MAG_ADDRESS 0x1E
@@ -1122,7 +1122,7 @@ void Device_Mag_getADC() {
 // ************************************************************************************************************
 // I2C Compass AK8975
 // ************************************************************************************************************
-// I2C adress: 0x0C (7bit)
+// I2C address: 0x0C (7bit)
 // ************************************************************************************************************
 #if defined(AK8975)
   #define MAG_ADDRESS 0x0C
@@ -1308,8 +1308,8 @@ void Gyro_getADC () {
 // ************************************************************************************************************
 // I2C Wii Motion Plus
 // ************************************************************************************************************
-// I2C adress 1: 0x53 (7bit)
-// I2C adress 2: 0x52 (7bit)
+// I2C address 1: 0x53 (7bit)
+// I2C address 2: 0x52 (7bit)
 // ************************************************************************************************************
 #define WMP_ADDRESS_1 0x53
 #define WMP_ADDRESS_2 0x52
@@ -1434,7 +1434,7 @@ uint16_t i2c_readReg16(int8_t addr, int8_t reg) {
 
 void i2c_srf08_change_addr(int8_t current, int8_t moveto) {
   // to change a srf08 address, we must write the following sequence to the command register
-  // this sequence must occur as 4 seperate i2c transactions!!   A0 AA A5 [addr]
+  // this sequence must occur as 4 separate i2c transactions!!   A0 AA A5 [addr]
   i2c_writeReg(current, SRF08_REV_COMMAND, 0xA0);    delay(30);
   i2c_writeReg(current, SRF08_REV_COMMAND, 0xAA);    delay(30);
   i2c_writeReg(current, SRF08_REV_COMMAND, 0xA5);    delay(30);
