@@ -509,8 +509,8 @@ void initOutput() {
       // init 16bit timer 3
       TCCR3A |= (1<<WGM31); // phase correct mode
       TCCR3A &= ~(1<<WGM30);
-      TCCR3B |= (1<<WGM33);
-      TCCR3B &= ~(1<<CS31); // no prescaler
+      TCCR3B |= (1<<WGM33) | (1<<CS30);
+      TCCR3B &= ~(1<<CS31) & ~(1<<CS32); // no prescaler
       ICR3   |= 0x3FFF; // TOP to 16383;      
       
       TCCR3A |= _BV(COM3C1); // connect pin 3 to timer 3 channel C
@@ -522,8 +522,8 @@ void initOutput() {
       // init 16bit timer 4
       TCCR4A |= (1<<WGM41); // phase correct mode
       TCCR4A &= ~(1<<WGM40);
-      TCCR4B |= (1<<WGM43);
-      TCCR4B &= ~(1<<CS41); // no prescaler
+      TCCR4B |= (1<<WGM43) | (1<<CS40);
+      TCCR4B &= ~(1<<CS41) & ~(1<<CS42); // no prescaler
       ICR4   |= 0x3FFF; // TOP to 16383;    
       
       TCCR4A |= _BV(COM4A1); // connect pin 6 to timer 4 channel A
